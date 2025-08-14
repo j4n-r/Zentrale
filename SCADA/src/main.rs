@@ -2,18 +2,24 @@ use axum::{
     extract::Path, routing::get, Json, Router
 };
 use serde_json::{json, Value};
-use tower_http::cors::{Any, CorsLayer};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| {
+                    "SCADA=debug,axum=debug,tower_http=debug".into()
+                })
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
     let cors = tower_http::cors::CorsLayer::new()
-        .allow_origin(tower_http::cors::Any)
-        .allow_methods(tower_http::cors::Any) 
-        .allow_headers(tower_http::cors::Any);
+        .allow_origin(tower_http::cors::Any);
 
     let app = Router::new()
-        .route("/api/{version}/network/devices", get(network)).layer(cors);
+        .route("/api/{version}/network/devices", get(network)).layer(cors).layer(tower_http::trace::TraceLayer::new_for_http());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
     axum::serve(listener, app).await.unwrap();
