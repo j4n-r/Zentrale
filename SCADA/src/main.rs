@@ -3,7 +3,7 @@ use axum::{
 };
 use serde_json::{json, Value};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use hue;
+mod tailscale;
 
 pub struct Config {
     pub api_url: String
@@ -11,7 +11,7 @@ pub struct Config {
 
 #[tokio::main]
 async fn main() {
-    dotenv::dotenv.ok();
+    dotenv::dotenv().ok();
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
@@ -34,3 +34,5 @@ async fn main() {
 async fn network(Path(_version): Path<String>)  -> Json<Value> {
     Json(json!([{ "data": 1 }, {"data": 2}]))
 }
+
+
