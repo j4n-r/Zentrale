@@ -9,14 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as NetworkRouteRouteImport } from './routes/network/route'
 import { Route as IndexRouteImport } from './routes/index'
 
-const LayoutRoute = LayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const NetworkRouteRoute = NetworkRouteRouteImport.update({
   id: '/network',
   path: '/network',
@@ -40,31 +35,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/network': typeof NetworkRouteRoute
-  '/_layout': typeof LayoutRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/network'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/network'
-  id: '__root__' | '/' | '/network' | '/_layout'
+  id: '__root__' | '/' | '/network'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   NetworkRouteRoute: typeof NetworkRouteRoute
-  LayoutRoute: typeof LayoutRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_layout': {
-      id: '/_layout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof LayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/network': {
       id: '/network'
       path: '/network'
@@ -85,7 +71,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   NetworkRouteRoute: NetworkRouteRoute,
-  LayoutRoute: LayoutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
