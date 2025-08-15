@@ -18,7 +18,7 @@ function App() {
           Edit <code>src/routes/index.tsx</code> and save to reload.
         </p>
         <a
-          className="text-[#61dafb] hover:underline"
+          className="text-[#61dafb]  hover:underline"
           href="https://reactjs.org"
           target="_blank"
           rel="noopener noreferrer"

@@ -2,12 +2,10 @@ import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
 import { useSidebar } from "@/components/ui/sidebar";
 
@@ -22,33 +20,39 @@ function RouteComponent() {
     <>
       <div className="w-full flex justify-center pt-4">
         <NavigationMenu viewport={false}>
-          <NavigationMenuList>
+          <NavigationMenuList className="gap-4">
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Home Network</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="text-md px-6 py-4">
+                Home Network
+              </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <NavigationMenuLink></NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Tailscale</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="text-md px-6 py-4">
+                Tailscale
+              </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[200px] gap-4">
+                <ul className="grid w-[100px] gap-4">
                   <li>
                     <NavigationMenuLink asChild>
                       <Link to="/">Network</Link>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
-                      <Link to="/">Devices</Link>
+                      <Link to="/network/devices">Devices</Link>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
-                      <Link to="/">Settings</Link>
+                      <Link to="/network/settings">Settings</Link>
                     </NavigationMenuLink>
                   </li>
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuTrigger>Router</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="text-md px-6 py-4">
+                Router
+              </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <NavigationMenuLink>Link</NavigationMenuLink>
               </NavigationMenuContent>

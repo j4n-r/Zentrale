@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as NetworkRouteRouteImport } from './routes/network/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NetworkSettingsRouteImport } from './routes/network/settings'
+import { Route as NetworkDevicesRouteImport } from './routes/network/devices'
 
 const NetworkRouteRoute = NetworkRouteRouteImport.update({
   id: '/network',
@@ -22,31 +24,47 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NetworkSettingsRoute = NetworkSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => NetworkRouteRoute,
+} as any)
+const NetworkDevicesRoute = NetworkDevicesRouteImport.update({
+  id: '/devices',
+  path: '/devices',
+  getParentRoute: () => NetworkRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/network': typeof NetworkRouteRoute
+  '/network': typeof NetworkRouteRouteWithChildren
+  '/network/devices': typeof NetworkDevicesRoute
+  '/network/settings': typeof NetworkSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/network': typeof NetworkRouteRoute
+  '/network': typeof NetworkRouteRouteWithChildren
+  '/network/devices': typeof NetworkDevicesRoute
+  '/network/settings': typeof NetworkSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/network': typeof NetworkRouteRoute
+  '/network': typeof NetworkRouteRouteWithChildren
+  '/network/devices': typeof NetworkDevicesRoute
+  '/network/settings': typeof NetworkSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/network'
+  fullPaths: '/' | '/network' | '/network/devices' | '/network/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/network'
-  id: '__root__' | '/' | '/network'
+  to: '/' | '/network' | '/network/devices' | '/network/settings'
+  id: '__root__' | '/' | '/network' | '/network/devices' | '/network/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  NetworkRouteRoute: typeof NetworkRouteRoute
+  NetworkRouteRoute: typeof NetworkRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +83,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/network/settings': {
+      id: '/network/settings'
+      path: '/settings'
+      fullPath: '/network/settings'
+      preLoaderRoute: typeof NetworkSettingsRouteImport
+      parentRoute: typeof NetworkRouteRoute
+    }
+    '/network/devices': {
+      id: '/network/devices'
+      path: '/devices'
+      fullPath: '/network/devices'
+      preLoaderRoute: typeof NetworkDevicesRouteImport
+      parentRoute: typeof NetworkRouteRoute
+    }
   }
 }
 
+interface NetworkRouteRouteChildren {
+  NetworkDevicesRoute: typeof NetworkDevicesRoute
+  NetworkSettingsRoute: typeof NetworkSettingsRoute
+}
+
+const NetworkRouteRouteChildren: NetworkRouteRouteChildren = {
+  NetworkDevicesRoute: NetworkDevicesRoute,
+  NetworkSettingsRoute: NetworkSettingsRoute,
+}
+
+const NetworkRouteRouteWithChildren = NetworkRouteRoute._addFileChildren(
+  NetworkRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  NetworkRouteRoute: NetworkRouteRoute,
+  NetworkRouteRoute: NetworkRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
