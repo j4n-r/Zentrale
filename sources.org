@@ -1,0 +1,4 @@
+* Source
+** Get linux system info
+*From https://docs.rs/sysinfo/latest/sysinfo/#how-it-works:*
+- https://blog.guillaume-gomez.fr/articles/2021-09-06+sysinfo%3A+how+to+extract+systems%27+information

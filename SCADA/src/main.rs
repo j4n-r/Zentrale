@@ -4,6 +4,7 @@ use axum::{
 use serde_json::{json, Value};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 mod tailscale;
+mod sysinfo;
 
 pub struct Config {
     pub api_url: String
@@ -11,6 +12,7 @@ pub struct Config {
 
 #[tokio::main]
 async fn main() {
+    println!("{:?}", sysinfo::System::instance());
     dotenv::dotenv().ok();
     tracing_subscriber::registry()
         .with(
@@ -34,5 +36,7 @@ async fn main() {
 async fn network(Path(_version): Path<String>)  -> Json<Value> {
     Json(json!([{ "data": 1 }, {"data": 2}]))
 }
+
+
 
 

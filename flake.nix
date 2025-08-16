@@ -38,7 +38,7 @@
           ];
           buildInputs = with pkgs; [
             openssl
-            pck-config
+            pkg-config
           ];
 
           PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
