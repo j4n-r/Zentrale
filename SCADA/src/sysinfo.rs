@@ -1,14 +1,22 @@
-use std::{collections::HashMap, fs, sync::OnceLock};
+use std::{fs, sync::OnceLock};
+
+use anyhow::Context;
 
 #[derive(Debug)]
 pub struct System {
     host_name: String,
     os_name: String,
     kernel_version: String,
-    // total_cpu_usage: i32,
+    // total_cpu_usage: u8,
+    //cpu_cores: u8,
     // cpu_usage_per_core: HashMap<String, i32>,
-    // total_mem_usage: i32,
+    // total_mem_usage: u8,
     // TODO add later processes, usage per process
+}
+#[derive(Debug)]
+pub struct CpuTime {
+    total_time: usize,
+    work_time: usize,
 }
 
 impl System {
@@ -46,5 +54,33 @@ impl System {
             .collect::<Vec<&str>>()
             .join(" ")
             .to_string()
+    }
+
+    // line=0 for all cores
+    fn get_cpu_usage(file_line: u16) -> anyhow::Result<CpuTime> {
+        let proc_stat = fs::read_to_string("/proc/stat").context("Error reading /proc/version")?;
+        let line = proc_stat
+            .lines()
+            .nth(file_line as usize)
+            .context("not enough lines in /proc/stat")?;
+        let mut vec = line
+            .strip_prefix("cpu")
+            .context("line did not start with cpu")?
+            .split_whitespace()
+            .map(|s| s.parse::<usize>().unwrap())
+            .collect::<Vec<usize>>();
+
+        let new_total_time: usize = vec.iter().sum();
+        let new_work_time = new_total_time - vec.remove(4); // if this fails smth is seriously wrong and it should panic
+        Ok(CpuTime {
+            total_time: new_total_time,
+            work_time: new_work_time,
+        })
+    }
+
+    fn calculate_cpu_usage(old_stats: CpuTime, new_stats: CpuTime) -> u8 {
+        let work_time_delta = new_stats.work_time - old_stats.work_time;
+        let total_time_delta = new_stats.total_time - old_stats.total_time;
+        ((work_time_delta / total_time_delta) * 100) as u8
     }
 }
