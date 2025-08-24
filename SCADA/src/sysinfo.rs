@@ -33,7 +33,7 @@ pub struct CpuTime {
 impl System {
     // use cpu_core = 0 for all cores
     pub fn new() -> Self {
-        let cpu_time = CpuTime::new(0).expect("");
+        let cpu_time = CpuTime::new(0).unwrap();
         System {
             host_name: get_hostname(),
             os_name: get_os_name(),
@@ -115,7 +115,7 @@ pub async fn start_system_monitor(tx: tokio::sync::watch::Sender<SystemMonitorMe
         let system = System::new();
         let mut old_cpu_time = system.cpu_time;
         loop {
-            let new_cpu_time = CpuTime::new(0).expect("");
+            let new_cpu_time = CpuTime::new(0).unwrap();
             let cpu_usage = calculate_cpu_usage(&old_cpu_time, &new_cpu_time);
             old_cpu_time = new_cpu_time;
             let _ = tx.send(SystemMonitorMessage {
