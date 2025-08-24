@@ -23,7 +23,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TanStack Start Starter" },
+      { title: "Zentrale" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
@@ -36,7 +36,6 @@ function RootComponent() {
       <SidebarProvider>
         <DashboardSidebar />
         <main className="flex-1 p-4 md:p-6 lg:p-8 min-h-screen bg-gray-50">
-          <SidebarTrigger className="mb-4 md:hidden" />
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
@@ -44,7 +43,7 @@ function RootComponent() {
       </SidebarProvider>
 
       <TanstackDevtools
-        config={{ position: "bottom-left" }}
+        config={{ position: "bottom-right" }}
         plugins={[
           { name: "Tanstack Router", render: <TanStackRouterDevtoolsPanel /> },
           TanStackQueryDevtools,

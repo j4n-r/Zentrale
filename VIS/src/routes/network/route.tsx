@@ -7,15 +7,12 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { useSidebar } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/network")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { setOpen } = useSidebar();
-  setOpen(false);
   return (
     <>
       <div className="w-full flex justify-center pt-4">
