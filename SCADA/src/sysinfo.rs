@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, time::Duration};
 
 use anyhow::Context;
 use serde::Serialize;
@@ -71,7 +71,7 @@ fn get_kernel_version() -> String {
 
 impl CpuTime {
     // cpu_core=0 for all cores
-    pub fn new(cpu_core: u16) -> anyhow::Result<Self> {
+    fn new(cpu_core: u16) -> anyhow::Result<Self> {
         let proc_stat = fs::read_to_string("/proc/stat").context("Error reading /proc/stat")?;
         let line = proc_stat
             .lines()
@@ -93,10 +93,26 @@ impl CpuTime {
     }
 }
 
-pub fn calculate_cpu_usage(old_stats: &CpuTime, new_stats: &CpuTime) -> Percantage {
+fn calculate_cpu_usage(old_stats: &CpuTime, new_stats: &CpuTime) -> Percantage {
     let work_time_delta = (new_stats.work_time - old_stats.work_time) as f64;
     let total_time_delta = (new_stats.total_time - old_stats.total_time) as f64;
     let usage = ((work_time_delta / total_time_delta) * 100.0).round() as u8;
     dbg!(usage);
     Percantage(usage)
+}
+
+pub async fn start_system_monitor(tx: tokio::sync::watch::Sender<SystemMonitorMessage>) {
+    tokio::spawn(async move {
+        let system = System::new();
+        let mut old_cpu_time = system.cpu_time;
+        loop {
+            let new_cpu_time = CpuTime::new(0).expect("");
+            let cpu_usage = calculate_cpu_usage(&old_cpu_time, &new_cpu_time);
+            old_cpu_time = new_cpu_time;
+            let _ = tx.send(SystemMonitorMessage {
+                total_cpu_usage: cpu_usage,
+            });
+            tokio::time::sleep(Duration::from_secs(3)).await;
+        }
+    });
 }
