@@ -16,9 +16,10 @@ pub struct System {
     pub host_name: String,
     pub os_name: String,
     pub kernel_version: String,
-    pub total_cpu_usage: Percantage,
-    pub cpu_time: CpuTime,
-    //cpu_cores: u8,
+    cpu_time: CpuTime,
+    pub cpu_cores: usize,
+    pub cpu_arch: String,
+    
     // cpu_usage_per_core: HashMap<String, i32>,
     // total_mem_usage: u8,
     // TODO add later processes, usage per process
@@ -37,8 +38,9 @@ impl System {
             host_name: get_hostname(),
             os_name: get_os_name(),
             kernel_version: get_kernel_version(),
-            total_cpu_usage: Percantage(0),
             cpu_time: cpu_time,
+            cpu_cores : get_cpu_cores(),
+            cpu_arch: std::env::consts::ARCH.to_string(),
         }
     }
 }
@@ -67,6 +69,12 @@ fn get_kernel_version() -> String {
         .collect::<Vec<&str>>()
         .join(" ")
         .to_string()
+}
+
+pub fn get_cpu_cores() -> usize {
+    std::thread::available_parallelism()
+        .unwrap()
+        .get()
 }
 
 impl CpuTime {
@@ -100,6 +108,7 @@ fn calculate_cpu_usage(old_stats: &CpuTime, new_stats: &CpuTime) -> Percantage {
     dbg!(usage);
     Percantage(usage)
 }
+
 
 pub async fn start_system_monitor(tx: tokio::sync::watch::Sender<SystemMonitorMessage>) {
     tokio::spawn(async move {
