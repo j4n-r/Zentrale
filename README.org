@@ -4,12 +4,13 @@
 Use `http://prometheus:9090` as the url in grafana (for developing)
 The internal Doocker network can resolve it.
 
-** TODO Small
-*** TODO add all cores to cpu usage
+** TODOS
+*** TODO Small
+**** TODO add all cores to cpu usage
  
-** TODO Big
-*** TODO Add moodle task scraping
-- I should be able to discjrd moodle tasks and they should no longer appear even though they get refetched
-*** TODO Add Network monitoring
-*** TODO Berlin map to get random place in the Ring
-*** TODO setup prometheus grafana etc.
+*** TODO Big
+**** TODO Add moodle task scraping
++ I should be able to discjrd moodle tasks and they should no longer appear even though they get refetched
+**** TODO Add Network monitoring
+**** TODO Berlin map to get random place in the Ring
+**** TODO setup prometheus grafana etc.
