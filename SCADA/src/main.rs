@@ -1,11 +1,13 @@
-
-use axum::{  routing::{any, get}, Router};
-use sysinfo::{ Percantage, SystemMonitorMessage};
+use axum::{
+    Router,
+    routing::{any, get},
+};
+use sysinfo::{Percantage, SystemMonitorMessage};
 use tokio::sync::watch;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 mod api;
+mod sse;
 mod sysinfo;
-mod ws;
 mod tailscale;
 
 pub struct Config {
@@ -13,7 +15,7 @@ pub struct Config {
 }
 
 #[derive(Clone)]
-pub struct AppState{
+pub struct AppState {
     rx_sm: watch::Receiver<SystemMonitorMessage>,
 }
 
@@ -34,13 +36,13 @@ async fn main() {
     });
     sysinfo::start_system_monitor(tx).await;
 
-    let state = AppState{ rx_sm: rx.clone()};
+    let state = AppState { rx_sm: rx.clone() };
 
     let cors = tower_http::cors::CorsLayer::new().allow_origin(tower_http::cors::Any);
 
     let app = Router::new()
         .route("/api/{version}/system/info", get(api::system_info))
-        .route("/ws/system/monitor", any(ws::ws_system_monitor))
+        .route("/sse/system/monitor", get(sse::system_monitor))
         .with_state(state)
         .layer(cors)
         .layer(tower_http::trace::TraceLayer::new_for_http());
@@ -48,4 +50,3 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
-
