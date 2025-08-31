@@ -6,10 +6,13 @@ use serde::Serialize;
 #[derive(Debug, Serialize, Clone, Copy)]
 pub struct SystemMonitorMessage {
     pub total_cpu_usage: Percantage,
+    pub mem_info: MemInfo
 }
 
 #[derive(Debug, Serialize, Clone, Copy)]
 pub struct Percantage(pub u8);
+#[derive(Debug, Serialize, Clone, Copy)]
+pub struct KB(pub i32);
 
 #[derive(Debug, Serialize)]
 pub struct System {
@@ -27,6 +30,12 @@ pub struct System {
 pub struct CpuTime {
     total_time: usize,
     work_time: usize,
+}
+
+#[derive(Debug, Serialize, Clone,Copy)]
+pub struct MemInfo {
+    pub mem_total: KB,
+    pub mem_free: KB,
 }
 
 impl System {
@@ -59,6 +68,26 @@ fn get_os_name() -> String {
         }
     }
     String::from("Unknown OS")
+}
+
+fn get_mem_info() -> MemInfo {
+    let mem_info = fs::read_to_string("/proc/meminfo").expect("Error reading /proc/meminfo");
+    let mem_total: i32 = mem_info
+        .split_whitespace()
+        .nth(1)
+        .expect("Error in /proc/meminfo")
+        .parse()
+        .expect("Error parsing mem_total to int");
+    let mem_free: i32 = mem_info
+        .split_whitespace()
+        .nth(7)
+        .expect("Error getting mem_avail")
+        .parse()
+        .expect("Error parsing mem_avail to int");
+    MemInfo{
+        mem_total : KB(mem_total),
+        mem_free: KB(mem_free)
+    }
 }
 fn get_kernel_version() -> String {
     let version = fs::read_to_string("/proc/version").expect("Error reading /proc/version");
@@ -116,6 +145,7 @@ pub async fn start_system_monitor(tx: tokio::sync::watch::Sender<SystemMonitorMe
             old_cpu_time = new_cpu_time;
             let _ = tx.send(SystemMonitorMessage {
                 total_cpu_usage: cpu_usage,
+                mem_info: get_mem_info()
             });
             tokio::time::sleep(Duration::from_secs(3)).await;
         }

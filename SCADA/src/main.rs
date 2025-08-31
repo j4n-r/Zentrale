@@ -2,7 +2,7 @@ use axum::{
     Router,
     routing::{any, get},
 };
-use sysinfo::{Percantage, SystemMonitorMessage};
+use sysinfo::{MemInfo, Percantage, SystemMonitorMessage, KB};
 use tokio::sync::watch;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 mod api;
@@ -33,6 +33,10 @@ async fn main() {
 
     let (tx, rx) = tokio::sync::watch::channel(SystemMonitorMessage {
         total_cpu_usage: Percantage(0),
+        mem_info: MemInfo{
+            mem_total :KB(0),
+            mem_free: KB(0)
+        }
     });
     sysinfo::start_system_monitor(tx).await;
 
